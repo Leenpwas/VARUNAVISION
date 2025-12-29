@@ -1,6 +1,26 @@
 # Orbbec Astra Pro Plus Streamer
 
-One-click setup to stream Orbbec Astra Pro Plus camera feeds to a web interface.
+One-command setup to stream Orbbec Astra Pro Plus camera feeds to a web interface.
+
+## 🚀 One-Command Setup (Recommended)
+
+Run this single command on your Raspberry Pi:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Leenpwas/VARUNAVISION/main/quick-setup.sh | bash
+```
+
+Or if you have the repo cloned:
+
+```bash
+./quick-setup.sh
+```
+
+That's it! The streamer will be installed and started automatically.
+
+Access at: `http://<RASPBERRY_PI_IP>:5000`
+
+---
 
 ## Compatible With
 
