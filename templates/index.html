@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbbec Astra Pro Plus - Live Stream</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .status.online {
+            background: #4caf50;
+        }
+
+        .status.offline {
+            background: #f44336;
+        }
+
+        .streams-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .stream-card {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .stream-header {
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stream-header h3 {
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stream-header .icon {
+            font-size: 1.3rem;
+        }
+
+        .fps {
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+
+        .stream-content {
+            position: relative;
+            width: 100%;
+            padding-top: 75%; /* 4:3 aspect ratio */
+        }
+
+        .stream-content video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        .stream-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #111;
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .info-panel {
+            max-width: 1600px;
+            margin: 20px auto 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .info-card {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .info-card .label {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .info-card .value {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .controls {
+            max-width: 1600px;
+            margin: 20px auto 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #45a049;
+        }
+
+        .btn-secondary {
+            background: #2196f3;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #0b7dda;
+        }
+
+        @media (max-width: 768px) {
+            .streams-container {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎥 Orbbec Astra Pro Plus - Live Stream</h1>
+        <span id="status" class="status">Checking...</span>
+    </div>
+
+    <div class="streams-container">
+        <!-- Color Stream -->
+        <div class="stream-card">
+            <div class="stream-header">
+                <h3><span class="icon">📷</span> RGB Color Stream</h3>
+                <span class="fps">30 FPS</span>
+            </div>
+            <div class="stream-content">
+                <img id="color-stream" src="/video/color" alt="Color Stream" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                <div class="stream-placeholder" style="display: none;">No Signal</div>
+            </div>
+        </div>
+
+        <!-- Depth Stream -->
+        <div class="stream-card">
+            <div class="stream-header">
+                <h3><span class="icon">🌊</span> Depth Stream</h3>
+                <span class="fps">30 FPS</span>
+            </div>
+            <div class="stream-content">
+                <img id="depth-stream" src="/video/depth" alt="Depth Stream" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                <div class="stream-placeholder" style="display: none;">No Signal</div>
+            </div>
+        </div>
+
+        <!-- Detection Stream -->
+        <div class="stream-card">
+            <div class="stream-header">
+                <h3><span class="icon">🔍</span> Object Detection</h3>
+                <span class="fps">30 FPS</span>
+            </div>
+            <div class="stream-content">
+                <img id="detection-stream" src="/video/detection" alt="Detection Stream" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
+                <div class="stream-placeholder" style="display: none;">No Signal</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-panel">
+        <div class="info-card">
+            <div class="label">Camera</div>
+            <div class="value">Orbbec Astra Pro+</div>
+        </div>
+        <div class="info-card">
+            <div class="label">Resolution</div>
+            <div class="value">640x480</div>
+        </div>
+        <div class="info-card">
+            <div class="label">Active Streams</div>
+            <div class="value" id="active-streams">3</div>
+        </div>
+        <div class="info-card">
+            <div class="label">Detection Mode</div>
+            <div class="value">Color-Based</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn btn-primary" onclick="refreshStreams()">🔄 Refresh Streams</button>
+        <button class="btn btn-secondary" onclick="toggleFullscreen()">🖥️ Fullscreen</button>
+    </div>
+
+    <script>
+        // Check status periodically
+        async function checkStatus() {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+
+                const allOnline = data.streams.color && data.streams.depth && data.streams.detection;
+                const statusEl = document.getElementById('status');
+
+                if (allOnline) {
+                    statusEl.textContent = '● Online';
+                    statusEl.className = 'status online';
+                } else {
+                    statusEl.textContent = '● Partial';
+                    statusEl.className = 'status offline';
+                }
+
+                // Update active streams count
+                const activeCount = Object.values(data.streams).filter(v => v).length;
+                document.getElementById('active-streams').textContent = activeCount;
+
+            } catch (error) {
+                document.getElementById('status').textContent = '● Offline';
+                document.getElementById('status').className = 'status offline';
+            }
+        }
+
+        function refreshStreams() {
+            const streams = ['color-stream', 'depth-stream', 'detection-stream'];
+            streams.forEach(id => {
+                const img = document.getElementById(id);
+                if (img) {
+                    img.src = img.src.split('?')[0] + '?t=' + new Date().getTime();
+                }
+            });
+            checkStatus();
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Initial check
+        checkStatus();
+
+        // Check status every 5 seconds
+        setInterval(checkStatus, 5000);
+    </script>
+</body>
+</html>
